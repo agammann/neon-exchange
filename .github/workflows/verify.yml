@@ -19,4 +19,17 @@ jobs:
       - run: pnpm build
       - run: git diff --exit-code -- dist/wallet.bundle.js
       - run: pnpm audit --prod
+      - name: Exercise deployed contracts in disposable Ethereum forks
+        if: github.ref == 'refs/heads/main'
+        run: node --test tests/fork.integration.mjs tests/orders.fork.integration.mjs
+        timeout-minutes: 5
+      - name: Verify current mainnet configuration without signing
+        if: github.ref == 'refs/heads/main'
+        run: pnpm check:mainnet
+        timeout-minutes: 2
+      - uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          name: mainnet-readiness
+          path: validation/mainnet-readiness.json
 

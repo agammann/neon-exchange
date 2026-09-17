@@ -2,9 +2,21 @@
 
 Status: deployed successfully at https://neon.alx21.chatgpt.site with public access. The shared order Worker and D1 schema are live. Public health and order API reads returned HTTP 200, chain ID 1, and ready storage. The initial mainnet book is empty. Four application assets match local SHA256 hashes. The rendered live order interface was verified separately.
 
-## Observed results
+## Release verification, September 17 UTC / September 16 Pacific
 
-23 tests passed, 0 failed on September 17, 2026 UTC (September 16 Pacific). This includes 21 offline tests and two separate Ethereum fork integration tests.
+25 tests passed, 0 failed: 23 offline tests and two real contract fork integration tests. This rerun includes signature tampering, partial and full fills, replay rejection, cancellation, approval revocation, expired orders, receipt idempotency including hash case, and recovery after simulated reorganizations of both fills and cancellations. The public book rechecks candidates regardless of cached status. Receipt history suppresses fills absent from current chain receipts and retains them for possible reappearance. Finality is explicitly not checked.
+
+Seven fresh browser transactions on chain 31337 passed with receipt status 1. Alice wrapped 0.002 ETH and signed a sell order. Bob paid 2 USDT for 0.001 WETH. Alice cancelled the remaining order and revoked WETH permission; Bob unwrapped the purchased 0.001 WETH. Both wallets ended with zero USDT and WETH allowances to 0x. Rejected signing published nothing, the stale cancelled fill was rejected before submission, and changing participant disabled transaction controls until reconnecting. Both tabs had no console errors. [Release browser evidence](validation/release-testnet.json) records balances, public test signatures, order states, and all seven receipts without keys or session capabilities.
+
+[Read only mainnet evidence](validation/mainnet-readiness.json) records chain ID 1, recent blocks, six contract code hashes, the 0x signing domain match, zero protocol fee multiplier, and live quotes in both directions. It requested no signatures and submitted no transactions. `pnpm check:mainnet` reproduces this check. Main branch CI now also runs the two fork suites and publishes a current mainnet readiness artifact.
+
+The new `/api/readiness` endpoint checks fresh Ethereum data plus Uniswap, USDT, and 0x integration identity. It returns HTTP 503 when settlement readiness fails even if `/api/health` still reports working storage. A successful readiness result does not verify an external wallet or certify safety.
+
+Mainnet trading is configured and publicly enabled. External wallet signing, hardware wallets, and current mobile wallet compatibility remain outside completed validation. A real mainnet smoke transaction must be reviewed and signed by its wallet owner. No independent security audit is claimed. These are explicit production signoff limits, not completed tests.
+
+## Earlier observed results
+
+The preceding revision had 23 tests passed, 0 failed on September 17, 2026 UTC (September 16 Pacific). This includes 21 offline tests and two separate Ethereum fork integration tests.
 
 The Ethereum fork at block 25,993,956 executed the real deployed Uniswap router and Tether bytecode locally. Selling 0.01 test ETH received 24.353445 USDT in that fork. The reverse trade returned native ETH to the same test account, and the exact USDT allowance became zero. Bob, the other ephemeral test account, received no funds from Alice’s trade. These are fork results, not a live quote, and no real funds were spent.
 

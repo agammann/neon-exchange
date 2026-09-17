@@ -1,0 +1,58 @@
+{
+  "checkedAt": "2026-09-17T03:14:15.788Z",
+  "chainId": 1,
+  "blockNumber": 25994447,
+  "blockHash": "0xcc620b9dee207c5e0e568af394e6523eaab82d0f017397de853d413e7308511b",
+  "blockTimestamp": 1789614839,
+  "contracts": "verified",
+  "protocolFeeMultiplier": "0",
+  "exchangeOwner": "0x618F9C67CE7Bf1a50afa1E7e0238422601b0ff6e",
+  "signingDomainMatches": true,
+  "codeHashes": {
+    "USDT": {
+      "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      "keccak256": "0xb44fb4e949d0f78f87f79ee46428f23a2a5713ce6fc6e0beb3dda78c2ac1ea55"
+    },
+    "WETH": {
+      "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "keccak256": "0xd0a06b12ac47863b5c7be4185c2deaad1c61557033f56c7d4ea74429cbb25e23"
+    },
+    "ROUTER": {
+      "address": "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+      "keccak256": "0xbb90113d2f9a5e9b7feb15a1d1fff06c1ee1575b3f9b1181778ffd0cf633e7ea"
+    },
+    "QUOTER": {
+      "address": "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
+      "keccak256": "0x06148f47d0f41a68d3bc970030a7150e5d608cfbc28d372440a2e41ce543d92b"
+    },
+    "FACTORY": {
+      "address": "0x1F98431c8aD98523631AE4a59f267346ea31F984",
+      "keccak256": "0x4d7b8525cd5d14343fa67a732fba5b24cddba11620ca88392f4ec6c52f91fd69"
+    },
+    "EXCHANGE": {
+      "address": "0xDef1C0ded9bec7F1a1670819833240f027b25EfF",
+      "keccak256": "0xade271f13b55729be286859c01c54fcb04c2dde098fc3bc9901c35927ece786e"
+    }
+  },
+  "quotes": [
+    {
+      "direction": "sell",
+      "amountIn": "10000000000000000",
+      "amountOut": "24319123",
+      "minimumOutput": "24197527",
+      "feeTier": 500,
+      "block": 25994448
+    },
+    {
+      "direction": "buy",
+      "amountIn": "10000000",
+      "amountOut": "4107873833438861",
+      "minimumOutput": "4087334464271666",
+      "feeTier": 500,
+      "block": 25994448
+    }
+  ],
+  "transactionsSubmitted": 0,
+  "signaturesRequested": 0,
+  "realFundsSpent": false
+}
