@@ -1,4 +1,5 @@
 import {Interface,Contract,getAddress,parseUnits,formatUnits} from 'ethers';
+import {CHAIN_ID,NETWORK_NAME} from './network.js';
 // Reviewed against official Tether and Uniswap deployment references. No remote configuration.
 export const ADDRESSES=Object.freeze({USDT:'0xdAC17F958D2ee523a2206206994597C13D831ec7',WETH:'0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',ROUTER:'0xE592427A0AEce92De3Edee1F18E0157C05861564',QUOTER:'0x61fFE014bA17989E743c5F6cB21bF9697530B21e',FACTORY:'0x1F98431c8aD98523631AE4a59f267346ea31F984'});
 export const TOKEN_ABI=['function balanceOf(address) view returns(uint256)','function allowance(address,address) view returns(uint256)','function approve(address,uint256)','function decimals() view returns(uint8)'];
@@ -19,13 +20,14 @@ export function buildSwap({direction,account,amountIn,amountOut,fee,slippageBps,
   const calls=[routerInterface.encodeFunctionData('exactInputSingle',[params])];
   if(!selling)calls.push(routerInterface.encodeFunctionData('unwrapWETH9',[minimum,recipient]));
   if(selling)calls.push(routerInterface.encodeFunctionData('refundETH'));
-  return {to:ADDRESSES.ROUTER,from:recipient,data:routerInterface.encodeFunctionData('multicall',[calls]),value:selling?amountIn:0n,chainId:1,minimum,deadline};
+  return {to:ADDRESSES.ROUTER,from:recipient,data:routerInterface.encodeFunctionData('multicall',[calls]),value:selling?amountIn:0n,chainId:CHAIN_ID,minimum,deadline};
 }
 export async function assertMainnet(provider){const network=await provider.getNetwork();if(network.chainId!==1n)throw Error('Select Ethereum Mainnet in your wallet. Other networks are not supported.');}
-export async function verifyContracts(provider){await assertMainnet(provider);const router=new Contract(ADDRESSES.ROUTER,ROUTER_ABI,provider);const usdt=new Contract(ADDRESSES.USDT,TOKEN_ABI,provider);const [weth,factory,decimals,...code]=await Promise.all([router.WETH9(),router.factory(),usdt.decimals(),...Object.values(ADDRESSES).map(a=>provider.getCode(a))]);if(getAddress(weth)!==ADDRESSES.WETH||getAddress(factory)!==ADDRESSES.FACTORY||decimals!==6n||code.some(c=>c==='0x'))throw Error('Contract identity check failed. Trading is unavailable.');}
+export async function assertNetwork(provider){const network=await provider.getNetwork();if(network.chainId!==BigInt(CHAIN_ID))throw Error(`Select ${NETWORK_NAME} in your wallet. Other networks are not supported.`);}
+export async function verifyContracts(provider){await assertNetwork(provider);const router=new Contract(ADDRESSES.ROUTER,ROUTER_ABI,provider);const usdt=new Contract(ADDRESSES.USDT,TOKEN_ABI,provider);const [weth,factory,decimals,...code]=await Promise.all([router.WETH9(),router.factory(),usdt.decimals(),...Object.values(ADDRESSES).map(a=>provider.getCode(a))]);if(getAddress(weth)!==ADDRESSES.WETH||getAddress(factory)!==ADDRESSES.FACTORY||decimals!==6n||code.some(c=>c==='0x'))throw Error('Contract identity check failed. Trading is unavailable.');}
 export function priceImpactBps({direction,amountIn,amountOut,sqrtPrice,fee}){const square=sqrtPrice*sqrtPrice,Q=2n**192n;const afterFee=amountIn*BigInt(1000000-fee)/1000000n;const expected=direction==='sell'?afterFee*square/Q:afterFee*Q/square;if(expected<=0n)throw Error('Amount too small to quote.');return amountOut>=expected?0:Number((expected-amountOut)*10000n/expected);}
 export async function quoteSwap(provider,{direction,amountIn}){
- await assertMainnet(provider);if(!['buy','sell'].includes(direction)||typeof amountIn!=='bigint'||amountIn<=0n)throw Error('Invalid quote request.');
+ await assertNetwork(provider);if(!['buy','sell'].includes(direction)||typeof amountIn!=='bigint'||amountIn<=0n)throw Error('Invalid quote request.');
  const q=new Contract(ADDRESSES.QUOTER,QUOTER_ABI,provider),factory=new Contract(ADDRESSES.FACTORY,['function getPool(address,address,uint24) view returns(address)'],provider);
  const block=await provider.getBlock('latest');if(!block||Math.abs(Date.now()/1000-block.timestamp)>180)throw Error('Ethereum data is stale. Try another wallet RPC.');
  const results=await Promise.allSettled(FEES.map(async fee=>{

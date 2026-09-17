@@ -8,7 +8,9 @@
     "test": "node --test tests/*.test.mjs",
     "check": "node --check dist/app.js && node --check dist/engine.js",
     "build": "node build.mjs",
-    "test:fork": "node --test tests/fork.integration.mjs"
+    "test:fork": "node --test tests/fork.integration.mjs",
+    "build:lab": "node scripts/build-lab.mjs",
+    "testnet": "node scripts/build-lab.mjs && node scripts/lab-server.mjs"
   },
   "engines": {
     "node": ">=22"

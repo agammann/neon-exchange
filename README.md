@@ -10,6 +10,21 @@ An ETH / USDT trading terminal with user controlled Ethereum wallet settlement a
 
 **Wallet trading** constructs real Ethereum Mainnet transactions through the existing Uniswap v3 SwapRouter. It supports selling native ETH for USDT and buying native ETH with USDT. It compares the direct WETH / USDT pools at 0.05%, 0.3%, and 1% fees. It does not provide real limit orders, match real users in the demo book, operate a broker, or guarantee the best available route. Wallet signatures and Ethereum gas are required. The app never requests a private key, seed phrase, or exchange deposit.
 
+## Interactive local testnet
+
+```sh
+pnpm install --frozen-lockfile
+pnpm testnet
+```
+
+Open http://127.0.0.1:4319 after the terminal says the lab is ready. Choose **Wallet trading**, then **Connect wallet**. The built in disposable wallet starts with Alice selected; the participant selector also offers Bob. Both receive test ETH and USDT during startup. Request a quote and confirm or reject the separate test wallet review dialog. You can sell ETH, buy ETH with USDT, approve an exact amount, reset an insufficient existing allowance, and revoke an approval. Receipts open locally.
+
+This is a local Ethereum fork on chain ID 31337, using the actual Tether and Uniswap contract code and copied liquidity state. These balances have no monetary value. It is not a public Sepolia deployment, official test USDT issuance, or a mainnet transaction. The upstream RPC supplies blockchain reads only. Startup requires internet access and can take a minute; `ETHEREUM_RPC_URL` can select another Ethereum read RPC. No wallet extension, faucet, private key, or money is required.
+
+The server binds only to 127.0.0.1. Local signing requires the page origin and a session capability, only accepts the disposable accounts, checks chain ID 31337, and only targets the fixed router or USDT contract. The test build refuses mainnet and does not discover external wallets. The hosted build excludes the test signer and accepts only chain ID 1. Generated lab files and session capabilities are excluded from Git. Stop the server with Ctrl+C; restarting creates fresh wallets and a new fork.
+
+See [validation evidence](VALIDATION.md) and [eight confirmed browser transaction receipts](validation/local-testnet.json). The lab exercises real contract execution locally. It does not establish external wallet compatibility or production safety.
+
 ## Custody and operator powers
 
 There is no Neon smart contract, token, vault, admin withdrawal key, fee recipient, hosted order API, user database, or custodial balance. The router and token addresses are fixed in this release. The connected account is the only settlement recipient. ETH purchases unwrap WETH and deliver native ETH atomically in the same transaction.
