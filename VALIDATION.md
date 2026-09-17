@@ -1,6 +1,6 @@
 # Neon validation
 
-Status: deployed successfully at https://neon.alx21.chatgpt.site with public access. All five application assets returned HTTP 200 without credentials. The two app modules, stylesheet, and wallet bundle matched local SHA256 hashes. Sites transforms the HTML response; the rendered application was verified separately.
+Status: deployed successfully at https://neon.alx21.chatgpt.site with public access. The shared order Worker and D1 schema are live. Public health and order API reads returned HTTP 200, chain ID 1, and ready storage. The initial mainnet book is empty. Four application assets match local SHA256 hashes. The rendered live order interface was verified separately.
 
 ## Observed results
 
@@ -8,7 +8,7 @@ Status: deployed successfully at https://neon.alx21.chatgpt.site with public acc
 
 The Ethereum fork at block 25,993,956 executed the real deployed Uniswap router and Tether bytecode locally. Selling 0.01 test ETH received 24.353445 USDT in that fork. The reverse trade returned native ETH to the same test account, and the exact USDT allowance became zero. Bob, the other ephemeral test account, received no funds from Alice’s trade. These are fork results, not a live quote, and no real funds were spent.
 
-Browser checks covered the actual Bob and Alice partial fill, updated balances, transaction history, synthetic chart, visible Neon branding, wallet mode, disabled disconnected actions, and the no wallet error. Both modes fit a 390 pixel mobile viewport without horizontal page overflow. Browser console showed no errors during those checks.
+Original simulator and instant swap browser checks covered the actual Bob and Alice partial fill, updated balances, transaction history, synthetic chart, visible Neon branding, wallet mode, disabled disconnected actions, and the no wallet error. Those original modes fit a 390 pixel viewport. The new shared order interface was checked on desktop; mobile wallet compatibility remains unverified. Browser console showed no errors during those checks.
 
 WebMCP read and simulated placement tools registered. A valid placement updated visible balances and state. A self trade attempt returned an intentional error and did not change balances. These tools cannot connect a wallet, approve tokens, or execute real transactions.
 
