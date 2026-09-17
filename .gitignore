@@ -4,3 +4,8 @@ node_modules/
 .env*
 
 .lab/
+
+.build/
+.local/
+dist/server/
+dist/.openai/

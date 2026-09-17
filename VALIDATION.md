@@ -4,7 +4,7 @@ Status: deployed successfully at https://neon.alx21.chatgpt.site with public acc
 
 ## Observed results
 
-15 tests passed, 0 failed on September 17, 2026 UTC (September 16 Pacific). This includes five matching engine tests, six transaction construction and validation tests, three network isolation tests, and one Ethereum fork integration test.
+23 tests passed, 0 failed on September 17, 2026 UTC (September 16 Pacific). This includes 21 offline tests and two separate Ethereum fork integration tests.
 
 The Ethereum fork at block 25,993,956 executed the real deployed Uniswap router and Tether bytecode locally. Selling 0.01 test ETH received 24.353445 USDT in that fork. The reverse trade returned native ETH to the same test account, and the exact USDT allowance became zero. Bob, the other ephemeral test account, received no funds from Alice’s trade. These are fork results, not a live quote, and no real funds were spent.
 
@@ -22,11 +22,19 @@ A rejected test wallet confirmation submitted no transaction. Bob's attempted 50
 
 The offline build tests prove the default settlement rejects chain 31337, the lab build rejects chain 1, and the public bundle excludes the local signing service. The original mainnet configuration also passed its separate fork integration after the network refactor, selling and buying through the real contract code locally. Test amounts and quotes describe those snapshots, not current market prices.
 
+## Live limit order verification
+
+Ten additional browser transactions confirmed on the local Ethereum fork. Alice and Bob used separate browser tabs and independently selected disposable wallets. Alice wrapped 0.02 ETH, approved 0.01 WETH, and published a signed sell order for 0.01 WETH at 2,000 USDT. Bob approved 10 USDT and filled 0.005 WETH. Alice cancelled the remaining order; Bob's stale fill attempt was rejected before submission.
+
+Alice then approved 2 USDT and posted a buy order for 0.001 WETH. Bob approved 0.001 WETH and filled it. Bob unwrapped his remaining 0.004 WETH. Alice revoked her unused WETH permission. Both users finished with zero 0x USDT and WETH allowances. Alice's first order was cancelled, her second was filled, and two confirmed fills were indexed from receipts. [Full evidence](validation/limit-orders-testnet.json) includes initial and final balances, signed test orders, API states, transaction requests, logs, and all ten successful receipts. No private keys or capabilities are included.
+
+The separate protocol/API integration test verifies mainnet signing hashes against deployed 0x code, signed order storage, partial fills, full fills, replay rejection, onchain cancellation, and receipt indexing. Unsigned or tampered orders are rejected. API tests cover body bounds, storage protection, and request budgets. Network compilation tests separate the public mainnet build from the local test signer.
+
 ## Limits
 
-No real wallet transaction has been signed or submitted. Actual browser extension signature prompts, hardware wallets, replacement transactions, hosted browser wallet behavior, and mobile wallet compatibility are not fully verified. There is no independent security audit. Fork testing is strong integration evidence, not proof of production safety or universal compatibility. The simulator is tab local, not a persistent multiplayer matching service. Wallet mode swaps against Uniswap pools, not against Bob and Alice’s simulated book.
+No real wallet transaction has been signed or submitted. Actual browser extension signature prompts, hardware wallets, replacement transactions, hosted browser wallet behavior, and mobile wallet compatibility are not fully verified. There is no independent security audit. Fork testing is strong integration evidence, not proof of production safety or universal compatibility. The simulator is tab local, not a persistent multiplayer matching service. Instant swaps use Uniswap pools; live signed orders use 0x wallet settlement; the separate educational demo remains simulated.
 
-The source and deployed static output are intended to match. Build with the lockfile and inspect the recipient, router, token, value, minimum output, and deadline before signing any real transaction. Do not treat a successful website deployment as verification of real money trading.
+The source and deployed build output are intended to match. Build with the lockfile and inspect the recipient, router, token, value, minimum output, and deadline before signing any real transaction. Do not treat a successful website deployment as verification of real money trading.
 
 Production dependency audit: no known vulnerabilities found. External user wallet signing remains unverified. The built in disposable test wallet was exercised through the browser.
 

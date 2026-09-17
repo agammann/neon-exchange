@@ -6,3 +6,5 @@ await writeFile('.lab/dist/index.html',html);
 await build({entryPoints:['src/lab-entry.js'],bundle:true,format:'esm',target:'es2022',define:{__NEON_LAB__:'true'},outfile:'.lab/dist/wallet.bundle.js'});
 await build({entryPoints:['src/settlement.js'],bundle:true,platform:'node',format:'esm',packages:'external',define:{__NEON_LAB__:'true'},outfile:'.lab/settlement.mjs'});
 console.log('Local testnet bundle built separately from the public mainnet build.');
+
+for(const name of ['orders','order-api'])await build({entryPoints:['src/'+name+'.js'],bundle:true,platform:'node',format:'esm',packages:'external',define:{__NEON_LAB__:'true'},outfile:'.lab/'+name+'.mjs'});

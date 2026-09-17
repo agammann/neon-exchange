@@ -1,78 +1,70 @@
 # Neon
 
-An ETH / USDT trading terminal with user controlled Ethereum wallet settlement and a separate Bob and Alice limit order simulator. The source is published for inspection. No open source license is granted.
+[Open Neon](https://neon.alx21.chatgpt.site) · [Public source](https://github.com/agammann/neon) · [Validation](VALIDATION.md)
 
-[Open Neon](https://neon.alx21.chatgpt.site) · [GitHub repository](https://github.com/agammann/neon)
+Neon is a noncustodial Ethereum trading interface with a shared WETH / USDT limit order book, native ETH / USDT instant swaps, and a separate educational Bob and Alice simulator. Source is public for inspection; no open source license is granted.
 
-## Two distinct modes
+## Trading
 
-**Bob + Alice demo** is a working, browser local matching engine with synthetic prices and simulated funds. Price priority, arrival priority, partial fills, reservations, cancellations, self trade rejection, and sequenced events are implemented. Clicking Run Bob + Alice demo starts a fresh session: Bob buys 0.050 ETH from Alice at 3,250.00 USDT per ETH for 162.50 USDT. Each starts with 10,000 USDT and 2 ETH. The chart is derived from executions; there is no fabricated live market feed. Reloading resets the simulation.
+Connect an Ethereum Mainnet wallet through its browser extension or wallet browser. Neon never asks for keys, seed phrases, or an exchange deposit. The Codex in app browser may not provide an Ethereum wallet.
 
-**Wallet trading** constructs real Ethereum Mainnet transactions through the existing Uniswap v3 SwapRouter. It supports selling native ETH for USDT and buying native ETH with USDT. It compares the direct WETH / USDT pools at 0.05%, 0.3%, and 1% fees. It does not provide real limit orders, match real users in the demo book, operate a broker, or guarantee the best available route. Wallet signatures and Ethereum gas are required. The app never requests a private key, seed phrase, or exchange deposit.
+**Limit orders:** Wrap native ETH to WETH if needed. WETH is ETH wrapped 1:1 in the canonical token contract and stays in your wallet. Choose buy or sell, quantity, price, and expiry. Prepare the exact token allowance, then review and sign the order in your wallet. The server verifies the signature, chain, funds, and allowance before publishing it to persistent shared storage. Orders contain no Neon fee or fee recipient.
+
+Another trader selects an order, enters a fill quantity, prepares their allowance, and confirms an onchain fill. Partial fills are supported. Prices and amounts are enforced by the existing 0x settlement contract. Purchased WETH can be unwrapped to native ETH. The UI rechecks onchain state and simulates transactions before signature. Confirmed fills are indexed from actual receipts.
+
+Orders expire after 15 minutes, 1 hour, 1 day, or 7 days. Cancel your order onchain to invalidate the remaining amount. Cancellation takes effect when confirmed; a fill can arrive first. Separate controls revoke USDT and WETH permissions to 0x. Open orders share wallet balances, so multiple orders do not reserve separate funds. Changing balances or allowances can make an order unfillable. Posting a crossing order does not automatically match another order: users actively fill selected orders. Each book page shows up to 20 bids and 20 asks in price and arrival order. Availability is checked on refresh and again before settlement. Unfunded entries can occupy page slots; navigate pages when needed. Maker history shows the latest 40 orders.
+
+**Instant swaps:** Sell native ETH for USDT or buy native ETH with USDT through Uniswap v3. The app compares three direct WETH / USDT fee tiers, sets minimum output, expires quotes after 30 seconds, and rejects estimated impact above 2%. It does not guarantee the best route across all exchanges. USDT approvals use exact amounts and reset an insufficient nonzero allowance before increasing it. Buying ETH unwraps WETH atomically.
+
+**Bob + Alice demo:** A separate browser local simulator demonstrates price and time priority, partial fills, reservations, cancellations, and self trade rejection. Its balances and reference price are synthetic. Its WebMCP tools cannot perform wallet actions.
+
+The shared mainnet book starts without seeded real orders. Users supply orders and counterparties; instant swaps use existing Uniswap liquidity. A public deployment does not create market makers or guarantee fills.
+
+## Custody and remaining trust
+
+Neon has no vault, withdrawal queue, custodial user balance, operator settlement key, custom settlement contract, or token. Transfers are enforced by existing contracts and go to the signed counterparties or connected swap wallet. The server stores public signed orders and receipt data, not funds or private keys. Disconnecting does not revoke approvals or cancel signed orders.
+
+Limit order spender: `0xDef1C0ded9bec7F1a1670819833240f027b25EfF` (0x Exchange Proxy). This protocol has its own upgrade governance; Neon does not control it. Its protocol fee multiplier is checked and must remain zero for this integration.
+
+Instant swap spender: `0xE592427A0AEce92De3Edee1F18E0157C05861564` (Uniswap v3 SwapRouter). USDT: `0xdAC17F958D2ee523a2206206994597C13D831ec7`. WETH: `0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2`.
+
+Website compromise, malicious updates, dependency or wallet compromise, protocol bugs and governance changes, RPC failures, Tether issuer controls, MEV, and reorgs remain risks. This release has no independent security audit and no completed external wallet mainnet signing test. One confirmation is not finality. Never describe Neon as impossible to rug or guaranteed safe.
 
 ## Interactive local testnet
+
+Requires Node.js 22.13 or newer and pnpm.
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm testnet
 ```
 
-Open http://127.0.0.1:4319 after the terminal says the lab is ready. Choose **Wallet trading**, then **Connect wallet**. The built in disposable wallet starts with Alice selected; the participant selector also offers Bob. Both receive test ETH and USDT during startup. Request a quote and confirm or reject the separate test wallet review dialog. You can sell ETH, buy ETH with USDT, approve an exact amount, reset an insufficient existing allowance, and revoke an approval. Receipts open locally.
+Open http://127.0.0.1:4319 when the lab reports ready. Connect the built in disposable wallet. Select Alice or Bob; separate tabs can use separate participants. Both start with test ETH and fork USDT. You can wrap, post signed orders, partially fill, cancel, revoke, unwrap, and swap through the same interface. A test wallet dialog requires explicit confirmation for each signature or transaction. Local receipts have no monetary value.
 
-This is a local Ethereum fork on chain ID 31337, using the actual Tether and Uniswap contract code and copied liquidity state. These balances have no monetary value. It is not a public Sepolia deployment, official test USDT issuance, or a mainnet transaction. The upstream RPC supplies blockchain reads only. Startup requires internet access and can take a minute; `ETHEREUM_RPC_URL` can select another Ethereum read RPC. No wallet extension, faucet, private key, or money is required.
+This is a local Ethereum fork on chain ID 31337, using copied Tether, WETH, Uniswap, and 0x contract code and state. It is not Sepolia, official test USDT issuance, or a mainnet transaction. The copied 0x implementation retains its immutable mainnet EIP712 signing domain; execution and the local API remain on chain 31337, using fresh disposable keys with no mainnet funding. The public server rejects lab execution profiles and requires mainnet funds and approvals before accepting orders.
 
-The server binds only to 127.0.0.1. Local signing requires the page origin and a session capability, only accepts the disposable accounts, checks chain ID 31337, and only targets the fixed router or USDT contract. The test build refuses mainnet and does not discover external wallets. The hosted build excludes the test signer and accepts only chain ID 1. Generated lab files and session capabilities are excluded from Git. Stop the server with Ctrl+C; restarting creates fresh wallets and a new fork.
+The test signer is excluded from the public bundle. The lab binds only to 127.0.0.1, requires the local origin and a session capability, and restricts signing to disposable accounts and canonical orders. It restricts transactions to fixed token and settlement addresses on chain 31337. Keys remain in process memory. Restarting resets the lab and its order book. Stop with Ctrl+C. Startup needs internet for blockchain reads and can take a minute. An optional private `ETHEREUM_RPC_URL` selects another Ethereum RPC. No faucet, extension, seed phrase, or real funds are needed.
 
-See [validation evidence](VALIDATION.md) and [eight confirmed browser transaction receipts](validation/local-testnet.json). The lab exercises real contract execution locally. It does not establish external wallet compatibility or production safety.
-
-## Custody and operator powers
-
-There is no Neon smart contract, token, vault, admin withdrawal key, fee recipient, hosted order API, user database, or custodial balance. The router and token addresses are fixed in this release. The connected account is the only settlement recipient. ETH purchases unwrap WETH and deliver native ETH atomically in the same transaction.
-
-USDT approvals are for the input amount, never an unlimited amount. Existing nonzero insufficient allowances are reset to zero in a separate user signed transaction before a new exact approval. A revoke control sets the router allowance to zero. Disconnecting does not revoke approvals. If sufficient allowance already exists, the app does not increase it.
-
-This removes Neon operator custody, not all risks. A compromised website can present malicious new code or misleading transaction requests. Users still trust their wallet, RPC, deployment, dependencies, Uniswap, and Tether. Tether retains issuer controls. MEV, price movement, reorgs, protocol failure, and compromised devices remain possible. This release has not received an independent security audit. Never describe it as impossible to rug or guaranteed safe.
-
-## Transaction checks
-
-Ethereum chain ID 1 is required. The wallet account and chain are rechecked before requests. On connection the app checks deployed bytecode presence, router factory and WETH references, and USDT decimals. Quotes expire after 30 seconds. Transactions have a three minute deadline, a nonzero minimum output, and 0.1%, 0.5%, or 1% slippage tolerance. Quotes with over 2% estimated price impact are refused. The spot comparison is not an independent price oracle. Before signature, the app simulates the call, estimates gas, and checks ETH coverage. The wallet remains the final review surface. Transaction links and one confirmation are shown; one confirmation does not guarantee finality.
-
-## Run locally
-
-Requires Node.js 22 or newer and pnpm. No API key is needed.
+## Development and deployment
 
 ```sh
-pnpm install --frozen-lockfile
-pnpm build
 pnpm test
+pnpm test:fork
+pnpm test:orders
+pnpm build
 pnpm start
 ```
 
-Open the local address printed by the server. For wallet mode, use a desktop browser with an Ethereum wallet extension or a compatible wallet browser. The Codex in app browser may not have an injected wallet. Never paste keys into this application.
+`pnpm start` runs the mainnet interface on http://127.0.0.1:4318 with persistent local SQLite order storage. It requires a real wallet for mainnet actions. The two fork suites execute locally and never submit upstream transactions. CI runs the offline tests, reproduces the browser build, and audits production dependencies.
 
-```sh
-pnpm test:fork
-```
+The Sites deployment uses a Cloudflare compatible Worker and a logical D1 binding named `DB`. `drizzle/` contains the schema migration. Sites provisions and applies the deployment resources. The Worker serves bundled assets, validates signed orders, reads onchain state, and indexes submitted receipt hashes. Shared fill history contains receipts indexed by this app; it is not a complete chain indexer. Order data and wallet addresses are public. Request budgets, body limits, per maker order limits, and storage bounds constrain abuse. Read RPC availability remains a service dependency.
 
-The fork integration test runs transactions only in an in process local Ethereum fork, using ephemeral test accounts. It reads public Ethereum data from PublicNode. Set `ETHEREUM_RPC_URL` privately to use another read RPC. It does not submit real transactions or spend real money. The test depends on RPC availability and is deliberately separate from the offline CI suite.
-
-## Source map
-
-* `dist/index.html`, `dist/style.css`, and `dist/app.js`: authored terminal and simulator interface.
-* `dist/engine.js`: deterministic simulation engine. Integer units: cash in microUSDT, quantities in milliETH, prices in USDT cents per ETH.
-* `src/settlement.js`: fixed contract references, quote logic, integer token math, and transaction construction.
-* `src/wallet.js`: wallet discovery, balance reads, review, approvals, swaps, revocation, and receipts.
-* `build.mjs`: bundles the wallet code and pinned ethers dependency into `dist/wallet.bundle.js`.
-* `tests/`: deterministic tests and an actual Ethereum fork settlement test.
-* `VALIDATION.md`: observed evidence and unverified boundaries.
-
-The hosted application is static. No credentials, cookies, user records, or private keys belong in its files. The Sites demo is publicly accessible. Google Fonts supplies visual fonts; scripts are bundled locally. The simulation exposes two optional browser WebMCP tools. Wallet actions are deliberately absent from that tool surface.
+Authored UI assets live in `dist/`. Wallet and protocol source lives in `src/`. `build.mjs` and `scripts/build-worker.mjs` produce the browser bundle, Worker, and migration artifacts. `scripts/build-lab.mjs` produces the isolated test profile. Generated state is ignored by Git. Never commit RPC credentials, cookies, session capabilities, or private keys.
 
 ## References
 
-The educational order book is inspired by [Brian Nigito’s How to Build an Exchange](https://www.janestreet.com/tech-talks/building-an-exchange/). This independent project does not reproduce Jane Street’s distributed infrastructure or performance and has no affiliation with Jane Street.
+Protocol fields and functions: [0x orders](https://docs.0xprotocol.org/en/latest/basics/orders.html), [0x settlement functions](https://docs.0xprotocol.org/en/latest/basics/functions.html), [0x deployments](https://github.com/0xProject/protocol/blob/development/packages/contract-addresses/addresses.json), and [0x proxy governance](https://docs.0xprotocol.org/en/latest/architecture/proxy.html).
 
-Contract addresses and integration behavior come from [Uniswap’s Ethereum deployments](https://developers.uniswap.org/docs/protocols/v3/deployments/v3-ethereum-deployments), [Uniswap’s swap interface](https://github.com/Uniswap/v3-periphery/blob/main/contracts/interfaces/ISwapRouter.sol), and [Tether’s integration guidelines](https://tether.to/en/supported-protocols/). The original v3 router is used here for its narrow direct approval and native asset workflow. Uniswap now recommends its Universal Router for new general integrations; this release deliberately does not request Permit2 permissions.
+Swap contracts and token behavior: [Uniswap Ethereum deployments](https://developers.uniswap.org/docs/protocols/v3/deployments/v3-ethereum-deployments), [SwapRouter interface](https://github.com/Uniswap/v3-periphery/blob/main/contracts/interfaces/ISwapRouter.sol), and [Tether integration guidance](https://tether.to/en/supported-protocols/).
 
-UI layout draws from common advanced trading terminal patterns described in [Coinbase’s dashboard overview](https://help.coinbase.com/coinbase/trading-and-funding/advanced-trade/dashboard-overview). No third party branding or interface assets are copied.
-
+The educational simulator was inspired by [Brian Nigito’s How to Build an Exchange](https://www.janestreet.com/tech-talks/building-an-exchange/). Neon has no affiliation with Jane Street and does not claim its distributed architecture or performance.

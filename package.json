@@ -10,7 +10,8 @@
     "build": "node build.mjs",
     "test:fork": "node --test tests/fork.integration.mjs",
     "build:lab": "node scripts/build-lab.mjs",
-    "testnet": "node scripts/build-lab.mjs && node scripts/lab-server.mjs"
+    "testnet": "node scripts/build-lab.mjs && node scripts/lab-server.mjs",
+    "test:orders": "node --test tests/orders.fork.integration.mjs"
   },
   "engines": {
     "node": ">=22"

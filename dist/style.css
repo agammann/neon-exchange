@@ -4,3 +4,8 @@
 
 
 .lab-banner{display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding:16px;margin-bottom:20px;border:2px solid #edce61;background:#29200c;color:#fff1b8}.lab-banner label{margin-left:auto}.lab-banner select{margin-left:10px}#lab-review{max-width:680px;width:90%;background:#111a25;color:#eef3ff;border:2px solid #edce61;border-radius:12px;padding:24px}#lab-review::backdrop{background:#000b}#lab-review pre{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8}#lab-review>div{display:flex;flex-wrap:wrap;gap:12px}
+
+.live-orders{margin-top:24px}.live-columns{display:grid;grid-template-columns:minmax(260px,1fr) minmax(380px,1.4fr);gap:24px}.live-orders h3{margin-top:24px}.live-orders details{margin-top:24px}.book-scroll{overflow:auto}.live-orders table{min-width:540px}.live-orders button{font-size:14px}.live-orders #fill-panel{border:1px solid #335365;padding:16px;margin-top:16px}.live-orders #live-trades a{overflow-wrap:anywhere}@media(max-width:850px){.live-columns{grid-template-columns:1fr}.live-orders .wallet-body{padding:16px}}
+
+.wallet-bar{padding:18px;margin-bottom:20px;display:grid;grid-template-columns:auto minmax(180px,1fr) minmax(240px,1fr);gap:12px;align-items:center}.wallet-bar p{margin:0}.wallet-bar #wallet-status{grid-column:1/-1}.wallet-bar #wallet-address{overflow-wrap:anywhere;font-size:14px}.wallet-bar #wallet-balances{grid-column:2/-1;font-size:16px}@media(max-width:700px){.wallet-bar{grid-template-columns:1fr}.wallet-bar #wallet-balances{grid-column:1}.wallet-bar p{overflow-wrap:anywhere}}
+.live-columns>div{min-width:0}.book-scroll{max-width:100%}.live-orders .wallet-connect-row{flex-wrap:wrap}.live-orders #book-page{flex:1;min-width:160px}
