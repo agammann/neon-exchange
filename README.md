@@ -1,8 +1,8 @@
-# Neon Exchange
+# Neon
 
 An ETH / USDT trading terminal with user controlled Ethereum wallet settlement and a separate Bob and Alice limit order simulator. The source is published for inspection. No open source license is granted.
 
-[Open Neon Exchange](https://neon-exchange.alx21.chatgpt.site) · [GitHub repository](https://github.com/agammann/neon-exchange)
+[Open Neon](https://neon.alx21.chatgpt.site) · [GitHub repository](https://github.com/agammann/neon)
 
 ## Two distinct modes
 

@@ -1,4 +1,4 @@
-name: Verify Neon Exchange
+name: Verify Neon
 on: [push, pull_request]
 permissions:
   contents: read
