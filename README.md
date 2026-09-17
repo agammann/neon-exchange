@@ -1,6 +1,8 @@
 # Neon Exchange
 
-An ETH / USDT trading terminal with user controlled Ethereum wallet settlement and a separate Bob and Alice limit order simulator. The source repository is private. No open source license is granted.
+An ETH / USDT trading terminal with user controlled Ethereum wallet settlement and a separate Bob and Alice limit order simulator. The source is published for inspection. No open source license is granted.
+
+[Open Neon Exchange](https://neon-exchange.alx21.chatgpt.site) · [GitHub repository](https://github.com/agammann/neon-exchange)
 
 ## Two distinct modes
 
@@ -49,7 +51,7 @@ The fork integration test runs transactions only in an in process local Ethereum
 * `tests/`: deterministic tests and an actual Ethereum fork settlement test.
 * `VALIDATION.md`: observed evidence and unverified boundaries.
 
-The hosted application is static. No credentials, cookies, user records, or private keys belong in its files. Sites access remains private unless the owner explicitly changes it. Google Fonts supplies visual fonts; scripts are bundled locally. The simulation exposes two optional browser WebMCP tools. Wallet actions are deliberately absent from that tool surface.
+The hosted application is static. No credentials, cookies, user records, or private keys belong in its files. The Sites demo is publicly accessible. Google Fonts supplies visual fonts; scripts are bundled locally. The simulation exposes two optional browser WebMCP tools. Wallet actions are deliberately absent from that tool surface.
 
 ## References
 
@@ -58,3 +60,4 @@ The educational order book is inspired by [Brian Nigito’s How to Build an Exch
 Contract addresses and integration behavior come from [Uniswap’s Ethereum deployments](https://developers.uniswap.org/docs/protocols/v3/deployments/v3-ethereum-deployments), [Uniswap’s swap interface](https://github.com/Uniswap/v3-periphery/blob/main/contracts/interfaces/ISwapRouter.sol), and [Tether’s integration guidelines](https://tether.to/en/supported-protocols/). The original v3 router is used here for its narrow direct approval and native asset workflow. Uniswap now recommends its Universal Router for new general integrations; this release deliberately does not request Permit2 permissions.
 
 UI layout draws from common advanced trading terminal patterns described in [Coinbase’s dashboard overview](https://help.coinbase.com/coinbase/trading-and-funding/advanced-trade/dashboard-overview). No third party branding or interface assets are copied.
+
